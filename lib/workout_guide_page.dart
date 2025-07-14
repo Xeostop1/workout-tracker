@@ -23,8 +23,8 @@ class WorkoutGuidePage extends StatelessWidget {
                 "스쿼트",
                   style: TextStyle(
                     fontFamily: "Pretendard",
-                    fontSize: 25,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
                     decoration: TextDecoration.underline,
                     decorationColor: Colors.blue,
                     decorationThickness: 2.0,
@@ -41,32 +41,31 @@ class WorkoutGuidePage extends StatelessWidget {
               ),
             ],
           ),
-          Row(
-            children: [
-              IconButton(
-                  onPressed: (){
-                    player.play(AssetSource('squat.mp3'));
-                  },
-                  icon: Icon(Icons.arrow_back_ios),
-              ),
-              // Expanded(child: Image.asset('assets/squat.png')),
-              Expanded(
-                child: Container(
-                  //왜 안되지????
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    //  image: DecorationImage(
-                    //   image: AssetImage('assets/squat.png'),
-                    //   fit: BoxFit.cover,
-                    // ),
-                  ),
+          Container(
+            //컨테이너에 사진 끝까지 채우고 화살표를 양사이드 스페이스 비트윈 주기
+            height: 300,
+              decoration: BoxDecoration(
+                 image: DecorationImage(
+                  image: AssetImage('assets/squat.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-              IconButton(
-                  onPressed: (){},
-                  icon: Icon(Icons.arrow_forward_ios),
-              ),
-            ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                    onPressed: (){
+                      player.play(AssetSource('squat.mp3'));
+                    },
+                    icon: Icon(Icons.arrow_back_ios),
+                ),
+                // Expanded(child: Image.asset('assets/squat.png')),
+                IconButton(
+                    onPressed: (){},
+                    icon: Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -163,12 +162,12 @@ class WorkoutGuidePage extends StatelessWidget {
             ],
           ),
           IconButton(
-            onPressed: (){},
+            onPressed: (){
+              player.play(AssetSource('squat.mp3'));
+            },
             icon: Icon(Icons.play_circle, color: Colors.blue,),
             iconSize: 70,
-
           )
-
         ],
       ),
     );
