@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'constants.dart';
 import 'dashboard_card.dart';
 
 class WorkoutHomePage extends StatefulWidget {
@@ -104,9 +105,124 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                     children: [
                       //1번
                       Expanded(
-                          child: DashboardCard()),
+                          child: DashboardCard(
+                            icon:Icon(
+                              Icons.push_pin_outlined,
+                              size: textTheme.titleMedium?.fontSize,
+                              color: colorScheme.outlineVariant,
+                            ),
+                            title:Text(
+                              "Today",
+                              style: textTheme.titleSmall?.copyWith(color: colorScheme.outlineVariant),
+                            ),
+                            info:
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text.rich(
+                                    textAlign:TextAlign.center,
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                            text: "운동시간\n",
+                                            style: textTheme.titleSmall?.copyWith(
+                                              color: colorScheme.outline,
+                                            )
+                                        ),
+                                        TextSpan(
+                                            text: "450분",
+                                            style: textTheme.titleLarge?.copyWith(
+                                                color: colorScheme.primary,
+                                                fontWeight: FontWeight.w600)
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text.rich(
+                                      textAlign:TextAlign.center,
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                              text: "소모칼로리\n",
+                                              style: textTheme.titleSmall?.copyWith(color: colorScheme.outline)
+                                          ),
+                                          TextSpan(
+                                              text: "2,400",
+                                              style: textTheme.titleLarge?.copyWith(
+                                                  color: colorScheme.primary,
+                                                  fontWeight: FontWeight.w600)
+                                          ),
+                                          TextSpan(
+                                              text: "kcal",
+                                              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)
+                                          )
+                                        ],
+                                      )
+                                  ),
+                                ],
+                              ),
+                            ),
+                      ),
                       //2번
-                      Expanded(child: DashboardCard()),
+                      Expanded(child: DashboardCard(
+                        icon:Icon(
+                          Icons.calendar_month_outlined,
+                          size: textTheme.titleMedium?.fontSize,
+                          color: colorScheme.outlineVariant,
+                        ),
+                        title:Text(
+                          "Monthly",
+                          style: textTheme.titleSmall?.copyWith(
+                              color: colorScheme.outlineVariant),
+                        ),
+                        info:
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text.rich(
+                              textAlign:TextAlign.center,
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                      text: "운동시간\n",
+                                      style: textTheme.titleSmall?.copyWith(
+                                        color: colorScheme.outline,
+                                      )
+                                  ),
+                                  TextSpan(
+                                      text: "450분",
+                                      style: textTheme.titleLarge?.copyWith(
+                                          color: colorScheme.primary,
+                                          fontWeight: FontWeight.w600)
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text.rich(
+                                textAlign:TextAlign.center,
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                        text: "소모칼로리\n",
+                                        style: textTheme.titleSmall?.copyWith(color: colorScheme.outline)
+                                    ),
+                                    TextSpan(
+                                        text: "2,400",
+                                        style: textTheme.titleLarge?.copyWith(
+                                            color: colorScheme.primary,
+                                            fontWeight: FontWeight.w600)
+                                    ),
+                                    TextSpan(
+                                        text: "kcal",
+                                        style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)
+                                    )
+                                  ],
+                                )
+                            ),
+                          ],
+                        ),
+                      ),
+                      ),
                     ],
                   ),
                 ),
@@ -118,15 +234,75 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                       children: [
                         SizedBox(
                           width: 170,
-                          child: DashboardCard(),
+                          child: DashboardCard(
+                            icon:Icon(
+                              Icons.run_circle_outlined,
+                              size: textTheme.titleMedium?.fontSize,
+                              color: colorScheme.outlineVariant,
+                            ),
+                            title:Text(
+                              "그룹1",
+                              style: textTheme.titleSmall?.copyWith(
+                                color: colorScheme.outlineVariant,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            info: Row(
+                              children: [
+                                Expanded(child: Image.asset("assets/group1.png")),
+                                Expanded(child: Text("아침을 여는 \n5가지 운동 "))
+                              ],
+                            ),
+                            backgroundColor: CustomColors.cardBg1
+                          ),
                         ),
                         SizedBox(
                           width: 170,
-                          child: DashboardCard(),
+                          child: DashboardCard(
+                            icon:Icon(
+                              Icons.fitness_center_outlined,
+                              size: textTheme.titleMedium?.fontSize,
+                              color: colorScheme.outlineVariant,
+                            ),
+                            title:Text(
+                              "그룹2",
+                              style: textTheme.titleSmall?.copyWith(
+                                color: colorScheme.outlineVariant,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            info: Row(
+                              children: [
+                                Expanded(child: Image.asset("assets/group2.png")),
+                                Expanded(child: Text("근력을 키우 \n는 7가지 운동 "))
+                              ],
+                            ),
+                            backgroundColor: CustomColors.cardBg2,
+                          ),
                         ),
                         SizedBox(
                           width: 170,
-                          child: DashboardCard(),
+                          child: DashboardCard(
+                            icon:Icon(
+                              Icons.rowing_outlined,
+                              size: textTheme.titleMedium?.fontSize,
+                              color: colorScheme.outlineVariant,
+                            ),
+                            title:Text(
+                              "그룹3",
+                              style: textTheme.titleSmall?.copyWith(
+                                color: colorScheme.outlineVariant,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            info: Row(
+                              children: [
+                                Expanded(child: Image.asset("assets/group3.png")),
+                                Expanded(child: Text("하루를 마무\n리하는 4가지 운동 "))
+                              ],
+                            ),
+                            backgroundColor: CustomColors.cardBg3,
+                          ),
                         ),
                       ],
                     ),
@@ -134,7 +310,45 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                 ),
                 Expanded(
                   flex: 2,
-                  child: DashboardCard())
+                  child: DashboardCard(
+                    icon:Icon(
+                      Icons.autorenew_outlined,
+                      size: textTheme.titleLarge?.fontSize,
+                      color: colorScheme.primary,
+                    ),
+                    title:Text(
+                      "운동이어서 하기",
+                      style: textTheme.titleSmall?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: textTheme.titleLarge?.fontSize,
+                      ),
+                    ),
+                    //info
+                    info: SizedBox.expand(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image:AssetImage('assets/continue.png'),
+                              fit:BoxFit.fitWidth,
+                              alignment: Alignment.bottomCenter
+                            ),
+                          ),
+                        child: Row(
+                        children: [
+                          SizedBox(width: 120,),
+                         Expanded(
+                             child: Text(
+                               '당신의 몸은 해 낼 수 있다. 당신의 마음만 설득하면 된다.',
+                               style: textTheme.titleMedium?.copyWith(color: colorScheme.outline,fontWeight: FontWeight.w600)
+                             ),
+                         ),
+                        ],
+                        )
+                      ),
+                    )
+                  ),
+                )
               ],
             )
         ),
