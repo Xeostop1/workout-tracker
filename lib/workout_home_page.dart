@@ -102,7 +102,10 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                   flex: 3,
                   child: Row(
                     children: [
-                      Expanded(child: DashboardCard()),
+                      //1번
+                      Expanded(
+                          child: DashboardCard()),
+                      //2번
                       Expanded(child: DashboardCard()),
                     ],
                   ),

@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
       ),
       // home: LandingPage(),
       // home: WorkoutListPage(),
-      home:WorkoutGuidePage()
-      // home:WorkoutHomePage()
+      // home:WorkoutGuidePage()
+      home:WorkoutHomePage()
     );
   }
 }
