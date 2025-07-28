@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import '../workout.dart';
 
 class WorkoutGuidePage extends StatefulWidget {
-  WorkoutGuidePage({super.key});
+  final int workoutsIndex;
+
+  WorkoutGuidePage({super.key,
+    required this.workoutsIndex
+  });
 
   @override
   State<WorkoutGuidePage> createState() => _WorkoutGuidePageState();
@@ -95,9 +99,12 @@ class _WorkoutGuidePageState extends State<WorkoutGuidePage> {
   late Workout currentWorkout;
   int workoutsIndex = 0;
 
+
   @override
   void initState() {
     super.initState();
+    //인잇에 넣은 이유!
+    workoutsIndex=widget.workoutsIndex;
     currentWorkout = workouts[workoutsIndex];
   }
 

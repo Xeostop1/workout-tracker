@@ -3,6 +3,7 @@ import 'package:hnworkouttracker/workout_guide_page.dart';
 import 'package:hnworkouttracker/workout_home_page.dart';
 import 'package:hnworkouttracker/workout_list_page.dart';
 import 'landing_page.dart';
+import 'my_router.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugShowCheckedModeBanner: false;
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Pretendard',
         scaffoldBackgroundColor: Colors.white,
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
       // home: LandingPage(),
       // home: WorkoutListPage(),
       // home:WorkoutGuidePage()
-      home:WorkoutHomePage()
+      // home:WorkoutHomePage()
     );
   }
 }

@@ -1,139 +1,75 @@
-//filename: workout_list_page.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../workout.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkoutListPage extends StatelessWidget {
-  WorkoutListPage({super.key});
 
-  List<Workout> workouts = [
-    Workout(
-      name: '스쿼트',
-      minutes: 30,
-      imageName: 'squat.png',
-      audioName: 'squat.mp3',
-      kcal: 200,
-    ),
-    Workout(
-      name: '윗몸 일으키기',
-      minutes: 20,
-      imageName: 'sit_up.png',
-      audioName: 'sit_up.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '마운틴 클림버',
-      minutes: 15,
-      imageName: 'mountain_climber.png',
-      audioName: 'mountain_climber.mp3',
-      kcal: 50,
-    ),
-    Workout(
-      name: '사이드 런지',
-      minutes: 20,
-      imageName: 'side_lunge.png',
-      audioName: 'side_lunge.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '푸시업',
-      minutes: 15,
-      imageName: 'push_up.png',
-      audioName: 'push_up.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '덩키 킥',
-      minutes: 30,
-      imageName: 'donkey_kick.png',
-      audioName: 'donkey_kick.mp3',
-      kcal: 50,
-    ),
-    Workout(
-      name: '사이드 플랭크',
-      minutes: 25,
-      imageName: 'side_plank.png',
-      audioName: 'side_plank.mp3',
-      kcal: 120,
-    ),
-    Workout(
-      name: '리버스 플랭크',
-      minutes: 25,
-      imageName: 'reverse_plank.png',
-      audioName: 'reverse_plank.mp3',
-      kcal: 120,
-    ),
-    Workout(
-      name: '힙 브릿지',
-      minutes: 20,
-      imageName: 'hip_bridge.png',
-      audioName: 'hip_bridge.mp3',
-      kcal: 80,
-    ),
-    Workout(
-      name: '어꺠 스트레칭',
-      minutes: 10,
-      imageName: 'shoulder_stretch.png',
-      audioName: 'shoulder_stretch.mp3',
-      kcal: 30,
-    ),
-    Workout(
-      name: '햄스트링',
-      minutes: 10,
-      imageName: 'hamstring_stretch.png',
-      audioName: 'hamstring_stretch.mp3',
-      kcal: 30,
-    ),
-  ];
 
-  List<GestureDetector> getWorkoutList(){
-    List<GestureDetector> workoutListRow=[];
-    for(var i=0;i<workouts.length;i++){
-      var name =workouts[i].name;
-      var image = workouts[i].imageName;
-      var minutes = workouts[i].minutes;
-      workoutListRow.add(
-        GestureDetector(
-          onTap: (){
-            //route code here
-          },
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.all(10),
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: AssetImage('assets/$image')),
+  List<String> workoutName = ['스쿼트',    '마운틴 클림버',    '푸시업',    '윗몸 일으키기',    '사이드 런지',    '덩키 킥',    '사이드 플랭크',    '리버스 플랭크',    '힙 브릿지',    '어꺠 스트레칭',    '햄스트링'  ];
+  List<String> workoutImage = ['squat.png',  'mountain_climber.png',    'push_up.png',    'sit_up.png',    'side_lunge.png',    'donkey_kick.png',    'side_plank.png',    'reverse_plank.png',    'hip_brdige.png',    'shoulder_stretch.png',    'hamstring_stretch.png',  ];
+  List<int> workoutMinutes = [30, 20, 15, 15, 20, 30, 20, 15, 25, 15, 10];
+
+  // //이런걸 헬퍼펑션이라고 한다
+  List<GestureDetector> getWorkoutList(BuildContext context){
+    List<GestureDetector> workoutListResult = [];
+    for(int i=0; i<workoutName.length; i++){
+      //todo: 혼자 꼭 만들어보기 익스펜디드
+      workoutListResult.add(
+          GestureDetector(
+            onTap: () {
+              context.go('/workout_home/workout_list/workout_guide/$i');
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage('assets/${workoutImage[i]}'
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Text('${i+1}.$name', style: TextStyle(fontSize: 20)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right:10.0),
-                child: Text('$minutes 분', style: TextStyle(fontSize: 20, color: Colors.blue)),
-              )
-            ],
-          ),
-        ),
+                Expanded(
+                  child: Text(
+                    '${i+1}${workoutName[i]}',
+                    style: TextStyle(
+                        fontSize: 20
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    '${workoutMinutes[i]}분',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.blue,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          )
       );
     }
-    return workoutListRow;
+    return workoutListResult;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('WorkoutList'),
+      appBar: AppBar(
+        title: Text("WorkoutList77"),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: getWorkoutList(context),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: getWorkoutList(),
-          ),
-        )
+      ),
     );
   }
 }
-
