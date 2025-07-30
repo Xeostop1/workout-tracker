@@ -1,6 +1,7 @@
 //filename:workout_home_page.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hnworkouttracker/workout_manager.dart';
 import 'package:intl/intl.dart';
 import 'dashboard_card.dart';
 
@@ -273,7 +274,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                         width: 170,
                         child: DashboardCard(
                           customOnTap: () {
-                            context.go('/workout_home/workout_list');
+                            context.go('/workout_home/workout_list/0');
                           },
                           icon: Icon(
                             Icons.run_circle_outlined,
@@ -293,7 +294,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                               Expanded(child: Image.asset('assets/group1.png')),
                               Expanded(
                                 child: Text(
-                                  '아침을 여는 5가지 운동',
+                                    '${WorkoutManager.workoutGroups[0].groupDescription}',
                                   style: textTheme.titleSmall?.copyWith(color: colorScheme.shadow),
                                 ),
                               ),
@@ -311,7 +312,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                         width: 170,
                         child: DashboardCard(
                           customOnTap: () {
-                            context.go('/workout_home/workout_list');
+                            context.go('/workout_home/workout_list/1');
                           },
                           icon: Icon(
                             Icons.fitness_center_outlined,
@@ -319,7 +320,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                             color: colorScheme.shadow,
                           ),
                           title: Text(
-                            '그룹2',
+                            '그룹3',
                             style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: colorScheme.shadow,
@@ -331,7 +332,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                               Expanded(child: Image.asset('assets/group2.png')),
                               Expanded(
                                 child: Text(
-                                  '근력을 키우는 7가지 운동',
+                                  '${WorkoutManager.workoutGroups[2].groupDescription}',
                                   style: textTheme.titleSmall?.copyWith(color: colorScheme.shadow),
                                 ),
                               ),
@@ -349,7 +350,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                         width: 170,
                         child: DashboardCard(
                           customOnTap: () {
-                            context.go('/workout_home/workout_list');
+                            context.go('/workout_home/workout_list/2');
                           },
                           icon: Icon(
                             Icons.rowing_outlined,

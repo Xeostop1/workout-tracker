@@ -1,13 +1,18 @@
 //filename:workout_guide_page.dart
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:hnworkouttracker/workout_manager.dart';
 import '../workout.dart';
 
 class WorkoutGuidePage extends StatefulWidget {
   final int workoutsIndex;
+  final int groupIndex;
+
+  late List<Workout> workouts;
 
   WorkoutGuidePage({super.key,
-    required this.workoutsIndex
+    required this.workoutsIndex,
+    required this.groupIndex
   });
 
   @override
@@ -15,86 +20,87 @@ class WorkoutGuidePage extends StatefulWidget {
 }
 
 class _WorkoutGuidePageState extends State<WorkoutGuidePage> {
-  List<Workout> workouts = [
-    Workout(
-      name: '스쿼트',
-      minutes: 30,
-      imageName: 'squat.png',
-      audioName: 'squat.mp3',
-      kcal: 200,
-    ),
-    Workout(
-      name: '윗몸 일으키기',
-      minutes: 20,
-      imageName: 'sit_up.png',
-      audioName: 'sit_up.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '마운틴 클림버',
-      minutes: 15,
-      imageName: 'mountain_climber.png',
-      audioName: 'mountain_climber.mp3',
-      kcal: 50,
-    ),
-    Workout(
-      name: '사이드 런지',
-      minutes: 20,
-      imageName: 'side_lunge.png',
-      audioName: 'side_lunge.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '푸시업',
-      minutes: 15,
-      imageName: 'push_up.png',
-      audioName: 'push_up.mp3',
-      kcal: 100,
-    ),
-    Workout(
-      name: '덩키 킥',
-      minutes: 30,
-      imageName: 'donkey_kick.png',
-      audioName: 'donkey_kick.mp3',
-      kcal: 50,
-    ),
-    Workout(
-      name: '사이드 플랭크',
-      minutes: 25,
-      imageName: 'side_plank.png',
-      audioName: 'side_plank.mp3',
-      kcal: 120,
-    ),
-    Workout(
-      name: '리버스 플랭크',
-      minutes: 25,
-      imageName: 'reverse_plank.png',
-      audioName: 'reverse_plank.mp3',
-      kcal: 120,
-    ),
-    Workout(
-      name: '힙 브릿지',
-      minutes: 20,
-      imageName: 'hip_bridge.png',
-      audioName: 'hip_bridge.mp3',
-      kcal: 80,
-    ),
-    Workout(
-      name: '어꺠 스트레칭',
-      minutes: 10,
-      imageName: 'shoulder_stretch.png',
-      audioName: 'shoulder_stretch.mp3',
-      kcal: 30,
-    ),
-    Workout(
-      name: '햄스트링',
-      minutes: 10,
-      imageName: 'hamstring_stretch.png',
-      audioName: 'hamstring_stretch.mp3',
-      kcal: 30,
-    ),
-  ];
+  // List<Workout> workouts = [
+  //   Workout(
+  //     name: '스쿼트',
+  //     minutes: 30,
+  //     imageName: 'squat.png',
+  //     audioName: 'squat.mp3',
+  //     kcal: 200,
+  //   ),
+  //   Workout(
+  //     name: '윗몸 일으키기',
+  //     minutes: 20,
+  //     imageName: 'sit_up.png',
+  //     audioName: 'sit_up.mp3',
+  //     kcal: 100,
+  //   ),
+  //   Workout(
+  //     name: '마운틴 클림버',
+  //     minutes: 15,
+  //     imageName: 'mountain_climber.png',
+  //     audioName: 'mountain_climber.mp3',
+  //     kcal: 50,
+  //   ),
+  //   Workout(
+  //     name: '사이드 런지',
+  //     minutes: 20,
+  //     imageName: 'side_lunge.png',
+  //     audioName: 'side_lunge.mp3',
+  //     kcal: 100,
+  //   ),
+  //   Workout(
+  //     name: '푸시업',
+  //     minutes: 15,
+  //     imageName: 'push_up.png',
+  //     audioName: 'push_up.mp3',
+  //     kcal: 100,
+  //   ),
+  //   Workout(
+  //     name: '덩키 킥',
+  //     minutes: 30,
+  //     imageName: 'donkey_kick.png',
+  //     audioName: 'donkey_kick.mp3',
+  //     kcal: 50,
+  //   ),
+  //   Workout(
+  //     name: '사이드 플랭크',
+  //     minutes: 25,
+  //     imageName: 'side_plank.png',
+  //     audioName: 'side_plank.mp3',
+  //     kcal: 120,
+  //   ),
+  //   Workout(
+  //     name: '리버스 플랭크',
+  //     minutes: 25,
+  //     imageName: 'reverse_plank.png',
+  //     audioName: 'reverse_plank.mp3',
+  //     kcal: 120,
+  //   ),
+  //   Workout(
+  //     name: '힙 브릿지',
+  //     minutes: 20,
+  //     imageName: 'hip_bridge.png',
+  //     audioName: 'hip_bridge.mp3',
+  //     kcal: 80,
+  //   ),
+  //   Workout(
+  //     name: '어꺠 스트레칭',
+  //     minutes: 10,
+  //     imageName: 'shoulder_stretch.png',
+  //     audioName: 'shoulder_stretch.mp3',
+  //     kcal: 30,
+  //   ),
+  //   Workout(
+  //     name: '햄스트링',
+  //     minutes: 10,
+  //     imageName: 'hamstring_stretch.png',
+  //     audioName: 'hamstring_stretch.mp3',
+  //     kcal: 30,
+  //   ),
+  // ];
 
+  List<Workout> workouts = WorkoutManager.workouts;
   final player = AudioPlayer();
   late Workout currentWorkout;
   int workoutsIndex = 0;
@@ -106,6 +112,7 @@ class _WorkoutGuidePageState extends State<WorkoutGuidePage> {
     //인잇에 넣은 이유!
     workoutsIndex=widget.workoutsIndex;
     currentWorkout = workouts[workoutsIndex];
+     workouts=WorkoutManager.workoutGroups[widget.groupIndex].workouts;
   }
 
   ///다음 운동으로 이동

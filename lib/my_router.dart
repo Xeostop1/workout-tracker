@@ -18,8 +18,12 @@ final router = GoRouter(
       builder: (context, state) => WorkoutHomePage(),
       routes: [
         GoRoute(
-          path: 'workout_list',
-          builder: (context, state) => WorkoutListPage(),
+          path: 'workout_list:/group_index',
+          builder: (context, state) {
+            String? groupIndexString=state.pathParameters['group_index'];
+            final groupIndex=int.parse(groupIndexString!);
+            return  WorkoutListPage(groupIndex:groupIndex);
+          },
           routes:[
             GoRoute(
               path: 'workout_guide/:workouts_index',
@@ -27,7 +31,10 @@ final router = GoRouter(
                 String? workoutsIndexString=state.pathParameters['workouts_index'];
                 final workoutsIndex=int.parse(workoutsIndexString!);
                 //객체로 넘겨주면서 종속성을 분리해서 인자로 넘겨줌 라우터 자체로 넘겨주지 않고
-                return WorkoutGuidePage(workoutsIndex: workoutsIndex);
+                String? groupIndexString=state.pathParameters['group_index'];
+                final groupIndex=int.parse(groupIndexString!);
+
+                return WorkoutGuidePage(workoutsIndex: workoutsIndex, groupIndex:groupIndex);
               },
             ),
           ]
