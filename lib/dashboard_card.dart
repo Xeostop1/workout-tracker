@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class DashboardCard extends StatelessWidget {
-  final Icon icon;
+  final Widget icon;
   final Text title;
   final Widget info;
   final Color? backgroundColor;

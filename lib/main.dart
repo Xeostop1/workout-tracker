@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hnworkouttracker/workout_guide_page.dart';
-import 'package:hnworkouttracker/workout_home_page.dart';
-import 'package:hnworkouttracker/workout_list_page.dart';
-import 'landing_page.dart';
 import 'my_router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; //
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugShowCheckedModeBanner: false;
+    debugShowCheckedModeBanner:
+    false;
     return MaterialApp.router(
       routerConfig: router,
       theme: ThemeData(
@@ -26,15 +28,15 @@ class MyApp extends StatelessWidget {
           primary: Color(0xff006eff),
           outline: Color(0xff717171),
           outlineVariant: Color(0xff717171),
-          surfaceDim: Color(0xff979797)
-        )
+          surfaceDim: Color(0xff979797),
+        ),
       ),
       darkTheme: ThemeData(
         fontFamily: 'Pretendard',
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color(0xff006eff),
           brightness: Brightness.dark,
-        )
+        ),
       ),
       // home: LandingPage(),
       // home: WorkoutListPage(),
@@ -43,7 +45,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
-

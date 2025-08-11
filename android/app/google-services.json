@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733049874863",
+    "project_id": "workout-project-859f4",
+    "storage_bucket": "workout-project-859f4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733049874863:android:08eb995a5d6e0e5142a75a",
+        "android_client_info": {
+          "package_name": "com.hnworkouttracker.hnworkouttracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPfXpvEZdXbfA8ML2rKFov79fc5FmGR-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

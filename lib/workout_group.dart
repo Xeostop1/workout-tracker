@@ -1,14 +1,7 @@
+import 'workout.dart';
 
-
-import 'package:hnworkouttracker/workout.dart';
-
-class WorkoutGroup {
+class WorkoutGroup{
   List<Workout> workouts;
   String groupDescription;
-
-  WorkoutGroup({
-    required this.workouts,
-    required this.groupDescription,
-});
-
+  WorkoutGroup({required this.workouts, required this.groupDescription});
 }
