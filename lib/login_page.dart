@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hnworkouttracker/firebase_auth_service.dart';
+import 'package:hnworkouttracker/show_snackbar.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   final _formKey = GlobalKey<FormState>();
+  final _auth = FirebaseAuthService();
   String? email;
   String? password;
 
@@ -127,7 +131,9 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.go('/settings/login/reset_password');
+                      },
                       child: Text('Forgot your password?'),
                     ),
                   ],
@@ -138,8 +144,14 @@ class LoginPage extends StatelessWidget {
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
                         _formKey.currentState?.save();
-                        print(email);
-                        print(password);
+                        _auth
+                            .signInWithEmail(email: email!, password: password!)
+                            .then((_) {
+                              showSnackBar(context, '로그인이 되었습니다.');
+                            })
+                            .catchError((error) {
+                              showSnackBar(context, error.toString());
+                            });
                       }
                     },
                     style: ElevatedButton.styleFrom(

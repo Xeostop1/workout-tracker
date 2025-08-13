@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hnworkouttracker/animation_pracice_widget.dart';
 import 'package:hnworkouttracker/landing_page.dart';
 import 'package:hnworkouttracker/registration_page.dart';
+import 'package:hnworkouttracker/reset_password_page.dart';
 import 'package:hnworkouttracker/workout_home_page.dart';
 
 import 'frame_page.dart';
@@ -22,6 +24,22 @@ final GlobalKey<NavigatorState> _settingsTabNavigatorKey =
 // GoRouter configuration
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
+  redirect: (context, state) {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if ((user == null) &&
+        (state.uri.path != '/settings/login/registration' &&
+            state.uri.path != '/settings/login/reset_password' &&
+            state.uri.path != '/')) {
+      return '/settings/login';
+    }
+    //settings tab클릭했을때 로그인 상태에따라 화면 이동
+    if (user != null &&
+        (state.uri.path == '/settings/login' ||
+            state.uri.path == '/settings/login/registration')) {
+      return '/settings';
+    }
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -95,6 +113,12 @@ final router = GoRouter(
                       path: 'registration',
                       builder: (context, state) {
                         return RegistrationPage();
+                      },
+                    ),
+                    GoRoute(
+                      path: 'reset_password',
+                      builder: (context, state) {
+                        return ResetPasswordPage();
                       },
                     ),
                   ],

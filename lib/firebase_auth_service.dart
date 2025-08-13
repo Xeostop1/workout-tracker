@@ -91,13 +91,75 @@ class FirebaseAuthService {
   }
 
   //로그인
-  Future<void> singUInithEmail() async {}
+  Future<void> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
+    String errorMessage;
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return;
+    } on FirebaseAuthException catch (error) {
+      switch (error.code) {
+        case 'user-not-found':
+          errorMessage = '해당 이메일로 가입된 사용자가 없습니다.';
+          break;
+        case 'wrong-password':
+          errorMessage = '비밀번호가 올바르지 않습니다.';
+          break;
+        case 'invalid-email':
+          errorMessage = '유효하지 않은 이메일입니다.';
+          break;
+        case 'invalid-credential':
+          errorMessage = '비밀번호가 올바르지 않거나 유효하지 않은 이메일입니다.';
+          break;
+        default:
+          errorMessage = error.message ?? '알 수 없는 오류가 발생했습니다.';
+      }
+    } catch (e) {
+      errorMessage = '알 수 없는 오류가 발생했습니다.';
+    }
+  }
 
-  //패스워드 변경
-  Future<void> reestPassword() async {}
+  //패스워드 변경  -> 비동기니까 비동기를 꼭 걸어줘야 함
+  Future<void> resetPassword({required String email}) async {
+    String? errorMessage;
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      print('비밀번호 재설정 이메일이 전송되었습니다.');
+    } on FirebaseAuthException catch (error) {
+      String? errorMessage;
+
+      switch (error.code) {
+        case 'auth/user-not-found':
+          errorMessage = '해당 이메일로 가입된 사용자가 없습니다.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = '유효하지 않은 이메일입니다.';
+          break;
+        default:
+          errorMessage = error.message ?? '알 수 없는 오류가 발생했습니다.';
+      }
+    } catch (error) {
+      errorMessage = '알 수 없는 오류가 발생했습니다.';
+    }
+    if (errorMessage != null) {
+      throw Exception(errorMessage);
+    }
+  }
+
+  bool isLoggedIn() {
+    return _auth.currentUser != null;
+  }
 
   //로그아웃
-  Future<void> SingOut() async {}
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 
   //회원탈퇴
   Future<void> deleteAccount() async {}
