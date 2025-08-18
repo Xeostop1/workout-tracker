@@ -148,8 +148,20 @@ class FirebaseAuthService {
     }
   }
 
+  //널을 리턴함 게터로 함수를 만듬
+  User? get user => _auth.currentUser;
+
   bool isLoggedIn() {
     return _auth.currentUser != null;
+  }
+
+  //성격적으로 분리해서 이름을 분리한다. 결국 같은 기능을 하기 때문에 분리하면 더 복잡하다
+  Future<void> updateName(String? name) async {
+    try {
+      await _auth.currentUser?.updateDisplayName(name);
+    } catch (e) {
+      throw Exception('수정 실패:$e');
+    }
   }
 
   //로그아웃

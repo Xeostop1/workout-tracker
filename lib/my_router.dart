@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hnworkouttracker/animation_pracice_widget.dart';
 import 'package:hnworkouttracker/landing_page.dart';
+import 'package:hnworkouttracker/profile_page.dart';
 import 'package:hnworkouttracker/registration_page.dart';
 import 'package:hnworkouttracker/reset_password_page.dart';
 import 'package:hnworkouttracker/workout_home_page.dart';
@@ -119,6 +120,12 @@ final router = GoRouter(
                       path: 'reset_password',
                       builder: (context, state) {
                         return ResetPasswordPage();
+                      },
+                    ),
+                    GoRoute(
+                      path: 'profile',
+                      builder: (context, state) {
+                        return ProfilePage();
                       },
                     ),
                   ],

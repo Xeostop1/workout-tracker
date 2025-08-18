@@ -1,5 +1,6 @@
 //filename:profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:hnworkouttracker/firebase_auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -10,9 +11,18 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
+  final _auth = FirebaseAuthService();
   String? name;
   String? email;
   String? profileImageURL;
+
+  @override
+  void initState() {
+    super.initState();
+    name = _auth.user?.displayName;
+    email = _auth.user?.email;
+    profileImageURL = _auth.user!.photoURL;
+  }
 
   @override
   Widget build(BuildContext context) {
