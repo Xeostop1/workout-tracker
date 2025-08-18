@@ -1,18 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hnworkouttracker/animation_pracice_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:hnworkouttracker/landing_page.dart';
-import 'package:hnworkouttracker/profile_page.dart';
+import 'package:hnworkouttracker/login_page.dart';
 import 'package:hnworkouttracker/registration_page.dart';
 import 'package:hnworkouttracker/reset_password_page.dart';
+import 'package:hnworkouttracker/profile_page.dart';
+import 'package:hnworkouttracker/settings_page.dart';
 import 'package:hnworkouttracker/workout_home_page.dart';
-
-import 'frame_page.dart';
-import 'login_page.dart';
-import 'settings_page.dart';
-import 'workout_guide_page.dart';
-import 'workout_list_page.dart';
+import 'package:hnworkouttracker/workout_list_page.dart';
+import 'package:hnworkouttracker/workout_guide_page.dart';
+import 'package:hnworkouttracker/frame_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -22,38 +21,37 @@ final GlobalKey<NavigatorState> _homeTabNavigatorKey =
 final GlobalKey<NavigatorState> _settingsTabNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'settingsTab');
 
-// GoRouter configuration
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   redirect: (context, state) {
-    User? user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
-    if ((user == null) &&
-        (state.uri.path != '/settings/login/registration' &&
-            state.uri.path != '/settings/login/reset_password' &&
-            state.uri.path != '/')) {
+    // 로그인 안 된 유저가 접근하면 로그인 페이지로 보냄
+    if (user == null &&
+        state.uri.path != '/settings/login' &&
+        state.uri.path != '/settings/login/registration' &&
+        state.uri.path != '/settings/login/reset_password' &&
+        state.uri.path != '/') {
       return '/settings/login';
     }
-    //settings tab클릭했을때 로그인 상태에따라 화면 이동
+
+    // 로그인한 유저가 로그인 페이지에 접근하려 할 경우 /settings로 리디렉션
     if (user != null &&
         (state.uri.path == '/settings/login' ||
             state.uri.path == '/settings/login/registration')) {
       return '/settings';
     }
+
+    return null; // 리디렉션 없음
   },
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => LandingPage(),
-
-      // builder: (context, state) => AnimationPraciceWidget(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => LandingPage()),
     StatefulShellRoute.indexedStack(
       parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state, navigationShell) {
-        return FramePage(child: navigationShell);
-      },
+      builder: (context, state, navigationShell) =>
+          FramePage(child: navigationShell),
       branches: [
+        // 🏋️ workout 홈 탭
         StatefulShellBranch(
           navigatorKey: _homeTabNavigatorKey,
           routes: [
@@ -61,30 +59,27 @@ final router = GoRouter(
               path: '/workout_home',
               builder: (context, state) => WorkoutHomePage(),
               routes: [
-                //workout_home/workout_list/1/workout_guide/3
                 GoRoute(
                   path: 'workout_list/:group_index',
                   builder: (context, state) {
-                    String? groupIndexString =
-                        state.pathParameters['group_index'];
-                    final int groupIndex = int.parse(groupIndexString!);
+                    final groupIndex = int.parse(
+                      state.pathParameters['group_index']!,
+                    );
                     return WorkoutListPage(groupIndex: groupIndex);
                   },
                   routes: [
                     GoRoute(
                       path: 'workout_guide/:workout_index',
                       builder: (context, state) {
-                        String? workoutIndexString =
-                            state.pathParameters['workout_index'];
-                        final int workoutIndex = int.parse(workoutIndexString!);
-
-                        String? groupIndexString =
-                            state.pathParameters['group_index'];
-                        final int groupIndex = int.parse(groupIndexString!);
-
+                        final groupIndex = int.parse(
+                          state.pathParameters['group_index']!,
+                        );
+                        final workoutIndex = int.parse(
+                          state.pathParameters['workout_index']!,
+                        );
                         return WorkoutGuidePage(
-                          workoutIndex: workoutIndex,
                           groupIndex: groupIndex,
+                          workoutIndex: workoutIndex,
                         );
                       },
                     ),
@@ -94,39 +89,30 @@ final router = GoRouter(
             ),
           ],
         ),
+
+        // ⚙️ settings 탭
         StatefulShellBranch(
           navigatorKey: _settingsTabNavigatorKey,
           routes: [
             GoRoute(
               path: '/settings',
-              builder: (context, state) {
-                return SettingsPage();
-              },
+              builder: (context, state) => SettingsPage(),
               routes: [
                 GoRoute(
+                  path: 'profile',
+                  builder: (context, state) => ProfilePage(),
+                ),
+                GoRoute(
                   path: 'login',
-                  builder: (context, state) {
-                    return LoginPage();
-                  },
-                  //하부라우트를 지정할 수 있음
+                  builder: (context, state) => LoginPage(),
                   routes: [
                     GoRoute(
                       path: 'registration',
-                      builder: (context, state) {
-                        return RegistrationPage();
-                      },
+                      builder: (context, state) => RegistrationPage(),
                     ),
                     GoRoute(
                       path: 'reset_password',
-                      builder: (context, state) {
-                        return ResetPasswordPage();
-                      },
-                    ),
-                    GoRoute(
-                      path: 'profile',
-                      builder: (context, state) {
-                        return ProfilePage();
-                      },
+                      builder: (context, state) => ResetPasswordPage(),
                     ),
                   ],
                 ),
