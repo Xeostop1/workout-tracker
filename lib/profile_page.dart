@@ -1,6 +1,7 @@
 // filename: profile_page.dart
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart'; // DEBUG: debugPrint 사용
 import 'package:flutter/material.dart';
 import 'package:hnworkouttracker/firebase_auth_service.dart';
 import 'package:hnworkouttracker/show_snackbar.dart';
@@ -27,41 +28,69 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isUploading = false;
 
   Future<void> _pickImage() async {
-    setState(() {
-      isUploading = true;
-    });
+    setState(() => isUploading = true);
 
     try {
+      debugPrint('DEBUG[ProfilePage]: 이미지 선택 시작');
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
       );
 
-      if (pickedFile != null) {
-        final Uint8List raw = await pickedFile.readAsBytes();
-        final Uint8List bytes = Uint8List.fromList(raw);
-
-        String? downloadURL = await _storage.uploadProfileImage(
-          bytes,
-          pickedFile.path,
-          _auth.user?.uid,
+      if (pickedFile == null) {
+        debugPrint(
+          'DEBUG[ProfilePage]: 사용자가 이미지를 선택하지 않음 (pickedFile == null)',
         );
+        if (mounted) showSnackBar(context, '이미지가 선택되지 않았어요.');
+        return;
+      }
 
+      final uid = _auth.user?.uid;
+      debugPrint('DEBUG[ProfilePage]: 선택된 파일 경로 = ${pickedFile.path}');
+      debugPrint('DEBUG[ProfilePage]: 현재 로그인 uid = $uid');
+
+      // 파일 바이트 확보
+      final Uint8List raw = await pickedFile.readAsBytes();
+      final Uint8List bytes = Uint8List.fromList(raw);
+      debugPrint('DEBUG[ProfilePage]: 바이트 길이 = ${bytes.length}');
+
+      // 업로드 시도
+      debugPrint('DEBUG[ProfilePage]: 업로드 시작...');
+      final String? downloadURL = await _storage.uploadProfileImage(
+        bytes,
+        pickedFile.path,
+        uid,
+      );
+      debugPrint('DEBUG[ProfilePage]: 업로드 완료. downloadURL = $downloadURL');
+
+      // 사용자 photoURL 업데이트
+      if (downloadURL != null && downloadURL.isNotEmpty) {
         await _auth.updatePhotoUrl(downloadURL);
+        debugPrint('DEBUG[ProfilePage]: Auth photoURL 업데이트 완료');
+      } else {
+        debugPrint('DEBUG[ProfilePage]: downloadURL이 null/빈 문자열임');
+      }
 
-        if (!mounted) return;
-        setState(() {
-          // 업로드 성공 시 네트워크 URL을 우선 사용
-          profileImageURL = downloadURL ?? pickedFile.path;
-        });
-      }
-    } catch (e) {
-      if (mounted) showSnackBar(context, e.toString());
-    } finally {
+      if (!mounted) return;
+      setState(() {
+        // 업로드 성공 시 네트워크 URL을 우선 반영
+        profileImageURL = downloadURL ?? pickedFile.path;
+      });
+
       if (mounted) {
-        setState(() {
-          isUploading = false;
-        });
+        showSnackBar(
+          context,
+          downloadURL != null
+              ? '프로필 사진이 업로드 되었어요.'
+              : '업로드는 시도했지만 URL을 받지 못했어요.',
+        );
       }
+    } catch (e, st) {
+      debugPrint('ERROR[ProfilePage]: 업로드 중 예외 발생: $e');
+      debugPrint('STACK[ProfilePage]: $st');
+      if (mounted) showSnackBar(context, '업로드 실패: $e');
+    } finally {
+      if (mounted) setState(() => isUploading = false);
+      debugPrint('DEBUG[ProfilePage]: 업로드 종료 (isUploading=false)');
     }
   }
 
@@ -71,6 +100,9 @@ class _ProfilePageState extends State<ProfilePage> {
     name = _auth.user?.displayName;
     email = _auth.user?.email;
     profileImageURL = _auth.user?.photoURL;
+    debugPrint(
+      'DEBUG[ProfilePage]: 초기값 name=$name, email=$email, photoURL=$profileImageURL',
+    );
   }
 
   @override
@@ -78,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // 현재 profileImageURL이 http면 네트워크, 파일 경로면 로컬, 없으면 에셋
+    // avatarProvider 결정
     late final ImageProvider avatarProvider;
     if (profileImageURL != null && profileImageURL!.isNotEmpty) {
       if (profileImageURL!.startsWith('http')) {
@@ -115,9 +147,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         backgroundImage: avatarProvider,
                         onBackgroundImageError: (_, __) {
                           if (!mounted) return;
-                          setState(() {
-                            profileImageURL = null;
-                          });
+                          debugPrint(
+                            'DEBUG[ProfilePage]: backgroundImage 로드 실패 -> 에셋으로 롤백',
+                          );
+                          setState(() => profileImageURL = null);
                         },
                         backgroundColor: Colors.transparent,
                       ),
@@ -157,19 +190,22 @@ class _ProfilePageState extends State<ProfilePage> {
                             onPressed: () async {
                               if (!mounted) return;
                               try {
+                                debugPrint(
+                                  'DEBUG[ProfilePage]: 프로필 사진 삭제 시도...',
+                                );
                                 await _auth.deletePhotoUrl();
                                 await _storage.deleteProfileImage(
                                   _auth.user?.uid,
                                 );
-                              } catch (e) {
-                                if (mounted) {
-                                  showSnackBar(context, e.toString());
-                                }
+                                debugPrint('DEBUG[ProfilePage]: 프로필 사진 삭제 완료');
+                                setState(() => profileImageURL = null);
+                                if (mounted)
+                                  showSnackBar(context, '프로필 사진이 삭제되었습니다.');
+                              } catch (e, st) {
+                                debugPrint('ERROR[ProfilePage]: 삭제 중 예외: $e');
+                                debugPrint('STACK[ProfilePage]: $st');
+                                if (mounted) showSnackBar(context, '삭제 실패: $e');
                               }
-                              if (!mounted) return;
-                              setState(() {
-                                profileImageURL = null;
-                              });
                             },
                           ),
                         ),
@@ -196,9 +232,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이름을 입력하세요';
-                  }
+                  if (value == null || value.isEmpty) return '이름을 입력하세요';
                   return null;
                 },
                 onSaved: (value) => name = value,
@@ -228,6 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   TextButton(
                     onPressed: () {
                       // TODO: 인증 메일 전송 로직 연결
+                      debugPrint('DEBUG[ProfilePage]: 이메일 인증 전송 눌림 (TODO)');
                     },
                     child: Text(
                       'Send Email',
@@ -247,13 +282,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
                       _formKey.currentState?.save();
+                      debugPrint('DEBUG[ProfilePage]: 이름 업데이트 시도 -> $name');
                       _auth
                           .updateName(name)
                           .then((_) {
-                            showSnackBar(context, '수정 되었습니다.');
+                            if (mounted) showSnackBar(context, '수정 되었습니다.');
                           })
-                          .catchError((e) {
-                            showSnackBar(context, e.toString());
+                          .catchError((e, st) {
+                            debugPrint(
+                              'ERROR[ProfilePage]: 이름 업데이트 실패: $e\n$st',
+                            );
+                            if (mounted) showSnackBar(context, e.toString());
                           });
                     }
                   },
@@ -281,6 +320,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   TextButton(
                     onPressed: () {
                       // TODO: 로그아웃 연결
+                      debugPrint('DEBUG[ProfilePage]: 로그아웃 클릭 (TODO)');
                     },
                     child: Text(
                       '로그아웃',
@@ -291,6 +331,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   TextButton(
                     onPressed: () {
                       // TODO: 회원탈퇴 연결
+                      debugPrint('DEBUG[ProfilePage]: 회원탈퇴 클릭 (TODO)');
                     },
                     child: Text(
                       '회원탈퇴',
