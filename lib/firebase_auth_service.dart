@@ -164,6 +164,22 @@ class FirebaseAuthService {
     }
   }
 
+  Future<void> updatePhotoUrl(String? url) async {
+    try {
+      await _auth.currentUser?.updatePhotoURL(url);
+    } catch (e) {
+      throw Exception('수정 실패:$e');
+    }
+  }
+
+  Future<void> deletePhotoUrl() async {
+    try {
+      await _auth.currentUser?.updatePhotoURL(null);
+    } catch (e) {
+      throw Exception('수정 실패:$e');
+    }
+  }
+
   //로그아웃
   Future<void> signOut() async {
     try {

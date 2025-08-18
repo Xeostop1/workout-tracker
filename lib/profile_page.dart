@@ -1,9 +1,12 @@
 // filename: profile_page.dart
 import 'dart:io'; // **** (로컬 파일 이미지 표시용)
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hnworkouttracker/firebase_auth_service.dart';
 import 'package:hnworkouttracker/show_snackbar.dart';
-import 'package:image_picker/image_picker.dart'; // **** (이미지 선택)
+import 'package:image_picker/image_picker.dart';
+
+import 'firebase_storage_service.dart'; // **** (이미지 선택)
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,24 +18,45 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuthService();
+  final _storage = FirebaseStorageService();
 
   String? name;
   String? email;
-  String? profileImageURL; // URL 또는 로컬 경로를 담음
-  final ImagePicker _picker = ImagePicker(); // ****
+  String? profileImageURL;
+  final ImagePicker _picker = ImagePicker();
+  bool isUploading = false; // **** (업로드 중 표시용)
 
   // **** 갤러리에서 이미지 선택 후 미리보기 반영
   Future<void> _pickImage() async {
+    setState(() {
+      isUploading = true;
+    });
+    try{
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
+      String? downloadURL;
+      downloadURL = await _storage.uploadProfileImage(
+        await pickedFile.readAsBytes(),
+        pickedFile.path,
+        _auth.user?.uid,
+      );
+      _auth.updatePhotoUrl(downloadURL); //서비스
       setState(() {
         // 로컬 파일 경로를 저장해 CircleAvatar에 표시
         profileImageURL = pickedFile.path;
       });
+    }
+    }catch(e){
+      showSnackBar(context, e.toString());
+    }
       // TODO: 필요하면 Firebase Storage에 업로드 후 photoURL 업데이트
       // await _auth.updatePhotoUrl(uploadedUrl);
+
+      setState(() {
+        isUploading = false;
+      });
     }
   }
 
@@ -97,13 +121,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     Positioned(
                       child: GestureDetector(
                         onTap: _pickImage,
-                        child: Icon(
-                          Icons.camera_alt,
-                          size:
-                              (textTheme.headlineMedium?.fontSize ??
-                              28), // **** null 대비
-                          color: colorScheme.onPrimary,
-                        ),
+                        child: isUploading
+                            ? CircularProgressIndicator()
+                            : Icon(
+                                Icons.camera_alt,
+                                size:
+                                    (textTheme.headlineMedium?.fontSize ??
+                                    28), // **** null 대비
+                                color: colorScheme.onPrimary,
+                              ),
                       ),
                     ),
                     // 닫기(초기화) 버튼
@@ -124,11 +150,19 @@ class _ProfilePageState extends State<ProfilePage> {
                               Icons.close,
                               color: colorScheme.onPrimary,
                             ),
-                            onPressed: () {
-                              setState(() {
-                                profileImageURL = null;
-                              });
-                            },
+                            onPressed: ()
+                              async{
+                                if(!context.mounted) return;
+                                try {
+                                  await _auth.deletePhotoUrl();
+                                  await _storage.deleteProfileImage(_auth.user?.uid);
+                                }catch(e){
+                                  showSnackBar(context, e.toString());
+                                }
+                                setState(() {
+                                  profileImageURL = null;
+                                });
+                              },
                           ),
                         ),
                       ),
