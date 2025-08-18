@@ -1,12 +1,12 @@
 // filename: profile_page.dart
-import 'dart:io'; // **** (로컬 파일 이미지 표시용)
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hnworkouttracker/firebase_auth_service.dart';
 import 'package:hnworkouttracker/show_snackbar.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'firebase_storage_service.dart'; // **** (이미지 선택)
+import 'firebase_storage_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,39 +24,44 @@ class _ProfilePageState extends State<ProfilePage> {
   String? email;
   String? profileImageURL;
   final ImagePicker _picker = ImagePicker();
-  bool isUploading = false; // **** (업로드 중 표시용)
+  bool isUploading = false;
 
-  // **** 갤러리에서 이미지 선택 후 미리보기 반영
   Future<void> _pickImage() async {
     setState(() {
       isUploading = true;
     });
-    try{
-    final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      String? downloadURL;
-      downloadURL = await _storage.uploadProfileImage(
-        await pickedFile.readAsBytes(),
-        pickedFile.path,
-        _auth.user?.uid,
-      );
-      _auth.updatePhotoUrl(downloadURL); //서비스
-      setState(() {
-        // 로컬 파일 경로를 저장해 CircleAvatar에 표시
-        profileImageURL = pickedFile.path;
-      });
-    }
-    }catch(e){
-      showSnackBar(context, e.toString());
-    }
-      // TODO: 필요하면 Firebase Storage에 업로드 후 photoURL 업데이트
-      // await _auth.updatePhotoUrl(uploadedUrl);
 
-      setState(() {
-        isUploading = false;
-      });
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
+
+      if (pickedFile != null) {
+        final Uint8List raw = await pickedFile.readAsBytes();
+        final Uint8List bytes = Uint8List.fromList(raw);
+
+        String? downloadURL = await _storage.uploadProfileImage(
+          bytes,
+          pickedFile.path,
+          _auth.user?.uid,
+        );
+
+        await _auth.updatePhotoUrl(downloadURL);
+
+        if (!mounted) return;
+        setState(() {
+          // 업로드 성공 시 네트워크 URL을 우선 사용
+          profileImageURL = downloadURL ?? pickedFile.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) showSnackBar(context, e.toString());
+    } finally {
+      if (mounted) {
+        setState(() {
+          isUploading = false;
+        });
+      }
     }
   }
 
@@ -65,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     name = _auth.user?.displayName;
     email = _auth.user?.email;
-    profileImageURL = _auth.user?.photoURL; // 서버에 저장된 photoURL (없을 수 있음)
+    profileImageURL = _auth.user?.photoURL;
   }
 
   @override
@@ -73,8 +78,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // **** 현재 profileImageURL이 http로 시작하면 네트워크, 아니면 로컬 파일, 없으면 에셋
-    ImageProvider avatarProvider;
+    // 현재 profileImageURL이 http면 네트워크, 파일 경로면 로컬, 없으면 에셋
+    late final ImageProvider avatarProvider;
     if (profileImageURL != null && profileImageURL!.isNotEmpty) {
       if (profileImageURL!.startsWith('http')) {
         avatarProvider = NetworkImage(profileImageURL!);
@@ -93,7 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
           key: _formKey,
           child: Column(
             children: [
-              // ==== 아바타 + 카메라 버튼 영역 (수정됨) ====
               Flexible(
                 child: Stack(
                   alignment: Alignment.center,
@@ -108,8 +112,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: CircleAvatar(
                         radius: 60,
-                        backgroundImage: avatarProvider, // ****
+                        backgroundImage: avatarProvider,
                         onBackgroundImageError: (_, __) {
+                          if (!mounted) return;
                           setState(() {
                             profileImageURL = null;
                           });
@@ -117,17 +122,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         backgroundColor: Colors.transparent,
                       ),
                     ),
-                    // **** 카메라 아이콘 탭 -> 이미지 선택
+                    // 카메라 아이콘 탭 -> 이미지 선택
                     Positioned(
                       child: GestureDetector(
                         onTap: _pickImage,
                         child: isUploading
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : Icon(
                                 Icons.camera_alt,
                                 size:
-                                    (textTheme.headlineMedium?.fontSize ??
-                                    28), // **** null 대비
+                                    (textTheme.headlineMedium?.fontSize ?? 28),
                                 color: colorScheme.onPrimary,
                               ),
                       ),
@@ -150,19 +154,23 @@ class _ProfilePageState extends State<ProfilePage> {
                               Icons.close,
                               color: colorScheme.onPrimary,
                             ),
-                            onPressed: ()
-                              async{
-                                if(!context.mounted) return;
-                                try {
-                                  await _auth.deletePhotoUrl();
-                                  await _storage.deleteProfileImage(_auth.user?.uid);
-                                }catch(e){
+                            onPressed: () async {
+                              if (!mounted) return;
+                              try {
+                                await _auth.deletePhotoUrl();
+                                await _storage.deleteProfileImage(
+                                  _auth.user?.uid,
+                                );
+                              } catch (e) {
+                                if (mounted) {
                                   showSnackBar(context, e.toString());
                                 }
-                                setState(() {
-                                  profileImageURL = null;
-                                });
-                              },
+                              }
+                              if (!mounted) return;
+                              setState(() {
+                                profileImageURL = null;
+                              });
+                            },
                           ),
                         ),
                       ),
@@ -219,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // TODO: 필요하면 인증 메일 전송 로직 연결
+                      // TODO: 인증 메일 전송 로직 연결
                     },
                     child: Text(
                       'Send Email',
